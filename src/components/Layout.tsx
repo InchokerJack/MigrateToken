@@ -42,7 +42,7 @@ export default function Layout() {
                     Amount of tokens to commit
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder="0" w="200px" ml="50px"/>
+                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -52,7 +52,7 @@ export default function Layout() {
                     Old balance
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder="0" w="200px" ml="50px"/>
+                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -62,7 +62,7 @@ export default function Layout() {
                     New balance
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder="0" w="200px" ml="50px"/>
+                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -72,7 +72,7 @@ export default function Layout() {
                     New commit balance
                 </Flex>
                 <Flex w="50%">
-                    <Input placeholder="0" w="200px" ml="50px"/>
+                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
                     <Flex color="gray.400" alignItems="center" ml="20px">
                         store in database
                     </Flex>
