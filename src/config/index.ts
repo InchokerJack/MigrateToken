@@ -1,0 +1,1 @@
+export const BSCTestNetUrl= 'https://data-seed-prebsc-1-S1.binance.org:8545'

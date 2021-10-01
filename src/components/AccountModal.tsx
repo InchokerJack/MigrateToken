@@ -13,20 +13,19 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, CopyIcon } from "@chakra-ui/icons";
-import { useEthers } from "@usedapp/core";
 import Identicon from "./Identicon";
+import {useWeb3React} from "@web3-react/core";
 
 type Props = {
   isOpen: any;
   onClose: any;
+  eTHBalance: any;
 };
 
-export default function AccountModal({ isOpen, onClose }: Props) {
-  const { account, deactivate } = useEthers();
-
+export default function AccountModal({ isOpen, onClose, eTHBalance }: Props) {
+  const {activate, deactivate } = useWeb3React()
   function handleDeactivateAccount() {
     deactivate();
-    onClose();
   }
 
   return (
@@ -93,11 +92,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
                 ml="2"
                 lineHeight="1.1"
               >
-                {account &&
-                  `${account.slice(0, 6)}...${account.slice(
-                    account.length - 4,
-                    account.length
-                  )}`}
+                {eTHBalance}
               </Text>
             </Flex>
             <Flex alignContent="center" m={3}>
@@ -118,7 +113,6 @@ export default function AccountModal({ isOpen, onClose }: Props) {
                 fontSize="sm"
                 display="flex"
                 alignItems="center"
-                href={`https://ropsten.etherscan.io/address/${account}`}
                 isExternal
                 color="gray.400"
                 ml={6}
