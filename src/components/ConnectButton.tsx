@@ -5,33 +5,6 @@ import {useWeb3React} from "@web3-react/core"
 import Web3 from 'web3'
 import {BSCTestNetUrl} from '../config'
 import {useEffect, useMemo, useState} from "react";
-import {Contract, ContractInterface} from "ethers";
-
-import {getContract} from "../utils/web3-utils";
-import {useWeb3Connection} from "../providers/Web3ConnectionProvider";
-
-export const useContract = <T extends Contract = Contract>(
-    address: string | undefined,
-    ABI: ContractInterface,
-    withSignerIfPossible = true,
-): T | undefined => {
-    const {library, account} = useWeb3Connection();
-    return useMemo(() => {
-        if (address && ABI && library) {
-            try {
-                return getContract<T>(
-                    address,
-                    ABI,
-                    library,
-                    withSignerIfPossible && account ? account : undefined,
-                );
-            } catch (error) {
-                console.error("Failed to get contract", error);
-            }
-        }
-        return;
-    }, [address, ABI, library, withSignerIfPossible, account]);
-};
 
 export const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42],
@@ -61,21 +34,17 @@ export default function ConnectButton({handleOpenModal, setETHBalance}: Props) {
     }
 
     useEffect(() => {
-        let load = true;
         async function getBalance() {
             const walletAddress = await web3.eth.getAccounts()
-            console.log(walletAddress[0])
+            if(walletAddress[0]){
             const balance = await web3.eth.getBalance(walletAddress[0])
             setBalance(balance)
             setETHBalance(balance)
             setWalletAddress(walletAddress[0])
+            }
         }
-
-        if (load) {
             getBalance()
-        }
-        return ()=>load = false;
-    }, [])
+    }, [balance])
 
     async function disconnect() {
         try {
