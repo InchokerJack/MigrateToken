@@ -15,6 +15,8 @@ import {
 import { ExternalLinkIcon, CopyIcon } from "@chakra-ui/icons";
 import Identicon from "./Identicon";
 import {useWeb3React} from "@web3-react/core";
+import {useContext} from "react";
+import {StoreContext} from "../App";
 
 type Props = {
   isOpen: any;
@@ -24,6 +26,7 @@ type Props = {
 
 export default function AccountModal({ isOpen, onClose, eTHBalance }: Props) {
   const {activate, deactivate } = useWeb3React()
+  const {state,dispatch} = useContext(StoreContext)
   function handleDeactivateAccount() {
     deactivate();
   }

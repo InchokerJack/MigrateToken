@@ -9,11 +9,13 @@ import {
 } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
-import {useState} from "react";
+import {useContext, useState} from "react";
+import {StoreContext} from "../App";
 
 export default function Layout() {
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [eTHBalance, setETHBalance] = useState(0);
+    const {state,dispatch} = useContext(StoreContext)
     return (
         <Box bg="gray.800" h="100vh" w="100%">
             <Flex>
@@ -54,7 +56,7 @@ export default function Layout() {
                     Old balance
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder={(eTHBalance?eTHBalance:0).toString()} w="200px" ml="50px" color="gray.400"/>
+                    <Input placeholder={(state.balance).toString()} w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>

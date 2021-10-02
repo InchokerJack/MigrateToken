@@ -4,7 +4,10 @@ import {InjectedConnector} from '@web3-react/injected-connector'
 import {useWeb3React} from "@web3-react/core"
 import Web3 from 'web3'
 import {BSCTestNetUrl} from '../config'
-import {useEffect, useMemo, useState} from "react";
+import {useContext, useEffect, useState} from "react";
+import {actionType, StoreContext} from "../App";
+import * as tokenMigration from '../config/token_migration.json';
+import getBlockchain from "../ethereum";
 
 export const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42],
@@ -18,33 +21,43 @@ type Props = {
 export default function ConnectButton({handleOpenModal, setETHBalance}: Props) {
     const {activate, deactivate} = useWeb3React()
     const web3 = new Web3(Web3.givenProvider || BSCTestNetUrl);
-    const [balance, setBalance] = useState<string | null>(null)
-    const [walletAddress, setWalletAddress] = useState<string | null>(null)
+    const {state, dispatch} = useContext(StoreContext)
 
     async function handleConnectWallet() {
-        await connect();
-    }
-
-    async function connect() {
-        try {
-            await activate(injected)
-        } catch (ex) {
-            console.log(ex)
-        }
+        // await connect();
     }
 
     useEffect(() => {
         async function getBalance() {
-            const walletAddress = await web3.eth.getAccounts()
-            if(walletAddress[0]){
-            const balance = await web3.eth.getBalance(walletAddress[0])
-            setBalance(balance)
-            setETHBalance(balance)
-            setWalletAddress(walletAddress[0])
+            // const walletAddress = await web3.eth.getAccounts()
+            // console.log(walletAddress)
+            // if (walletAddress[0]) {
+            // let balance = parseFloat(await web3.eth.getBalance(walletAddress[0]))
+            // balance = balance/Math.pow(10,18)
+            // dispatch({type: actionType.NEW_ADDRESS, metaData: {address: walletAddress[0], balance}})
+            try {
+                const {token_migration,oldSpon} = await getBlockchain();
+                const giftAddress = await token_migration.getOwnerGiftAddress()
+                console.log(giftAddress)
+                const walletAddress = await token_migration.getuserAddress()
+                const oldBal = await token_migration.oldSponBalance(walletAddress)
+                // oldBal =(parseInt(oldBal)/10**18)
+                let newBal = await token_migration.newSponBalance(walletAddress)
+                newBal =(parseInt(newBal)/10**18)
+                console.log('new balance is', newBal)
+                console.log('old balance is', oldBal)
+                const result = await oldSpon.approve("0x2D51921170B69c07329cF203C53d3F031588A829", oldBal)
+                console.log('result is', result)
+                await token_migration.swapToken('500');
+
+            } catch (e) {
+                console.log('error is',e)
+                // }
+                // }
             }
         }
-            getBalance()
-    }, [balance])
+        getBalance()
+    }, [])
 
     async function disconnect() {
         try {
@@ -54,7 +67,7 @@ export default function ConnectButton({handleOpenModal, setETHBalance}: Props) {
         }
     }
 
-    return balance ? (
+    return state.address ? (
         <Box
             display="flex"
             alignItems="center"
@@ -83,7 +96,7 @@ export default function ConnectButton({handleOpenModal, setETHBalance}: Props) {
                 height="38px"
             >
                 <Text color="white" fontSize="md" fontWeight="medium" mr="2">
-                    {walletAddress}
+                    {state.address}
                 </Text>
                 <Identicon/>
             </Button>
