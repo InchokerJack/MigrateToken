@@ -1,27 +1,43 @@
-import {
-    Box, Button,
-    Checkbox,
-    Flex,
-    Heading,
-    Input,
-    Spacer,
-    useDisclosure,
-} from "@chakra-ui/react";
+import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, useDisclosure,} from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
 import {useContext, useState} from "react";
-import {StoreContext} from "../App";
+import {actionType, StoreContext} from "../App";
+import ModalDialog from "./ModalDialog";
+import getBlockchain from "../ethereum";
+import {BigNumber} from "ethers";
 
 export default function Layout() {
     const {isOpen, onOpen, onClose} = useDisclosure();
-    const [eTHBalance, setETHBalance] = useState(0);
     const {state,dispatch} = useContext(StoreContext)
+    const [askAgree, setAskAgree] = useState(false)
+    const [check,setCheck] = useState(false)
+    // function confirmCheck(){
+    //     let asked = false;
+    //     if(!check&&!asked){
+    //         console.log('here')
+    //         dispatch({type:actionType.ASK_AGREE,metaData:{}})
+    //         setAskAgree(true)
+    //         asked=true
+    //     }
+    // }
+
+    async function handleMigrate(){
+        const {tokenMigration, oldSpon} = await getBlockchain();
+            const result = await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", state.balance )
+            console.log('result is', result)
+            setTimeout(async ()=>{await tokenMigration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));},10000)
+    }
+
     return (
         <Box bg="gray.800" h="100vh" w="100%">
+        <ModalDialog open={askAgree} message={'You should agree to commit JURY'}/>
+        <ModalDialog open={false} message={'You are not connected. You should connect to Metamask'}/>
+        <ModalDialog open={false} message={'You are not connected. You should connect to Metamask'}/>
             <Flex>
                 <Spacer/>
-                <ConnectButton handleOpenModal={onOpen} setETHBalance={setETHBalance}/>
-                <AccountModal isOpen={isOpen} onClose={onClose} eTHBalance={eTHBalance}/>
+                <ConnectButton handleOpenModal={onOpen} />
+                <AccountModal isOpen={isOpen} onClose={onClose}/>
             </Flex>
             <Box h="100px" w="100%"></Box>
             <Flex w="100%" justifyContent="center">
@@ -46,7 +62,9 @@ export default function Layout() {
                     Amount of tokens to commit
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
+                    <Input
+                        // onClick={confirmCheck}
+                           placeholder="0" w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -56,7 +74,7 @@ export default function Layout() {
                     Old balance
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder={(state.balance).toString()} w="200px" ml="50px" color="gray.400"/>
+                    <Input placeholder={state.balance?(state.balance).toString():'0'} w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -84,7 +102,7 @@ export default function Layout() {
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Button w="100px">Migrate</Button>
+                <Button w="100px" onClick={handleMigrate}>Migrate</Button>
             </Flex>
         </Box>
     );
