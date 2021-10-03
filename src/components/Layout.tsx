@@ -1,26 +1,45 @@
 import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, useDisclosure,} from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
-import {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {actionType, StoreContext} from "../App";
-import ModalDialog from "./ModalDialog";
+import Dialog from "./Dialog";
 import getBlockchain from "../ethereum";
 import {BigNumber} from "ethers";
 
 export default function Layout() {
     const {isOpen, onOpen, onClose} = useDisclosure();
+    const {
+        isOpen: isOpenDialog,
+        onOpen: onOpenDialog,
+        onClose: onCloseDialog
+    } = useDisclosure()
     const {state,dispatch} = useContext(StoreContext)
-    const [askAgree, setAskAgree] = useState(false)
     const [check,setCheck] = useState(false)
-    // function confirmCheck(){
-    //     let asked = false;
-    //     if(!check&&!asked){
-    //         console.log('here')
-    //         dispatch({type:actionType.ASK_AGREE,metaData:{}})
-    //         setAskAgree(true)
-    //         asked=true
-    //     }
-    // }
+    const oldBalance = state.balance?state.balance:0
+    const [commitAmount, setCommitAmount] = useState(0)
+    const [newBalance, setNewBalance] = useState(0)
+
+    function handleInputAmount(e: React.FormEvent<HTMLInputElement>){
+        const value = e.currentTarget.value || '0'
+        setCommitAmount(parseFloat(value))
+    }
+
+    function handleClick(){
+        if(!check){
+            onOpenDialog()
+        }
+    }
+
+    function handleCheck(e: React.FormEvent<HTMLDivElement>){
+        setCheck((check)=>!check)
+    }
+
+    useEffect(()=>{
+        const timeout = setTimeout(()=>{
+           setNewBalance(oldBalance-commitAmount)},2000)
+        return ()=>clearTimeout(timeout)
+    },[commitAmount])
 
     async function handleMigrate(){
         const {tokenMigration, oldSpon} = await getBlockchain();
@@ -31,9 +50,7 @@ export default function Layout() {
 
     return (
         <Box bg="gray.800" h="100vh" w="100%">
-        <ModalDialog open={askAgree} message={'You should agree to commit JURY'}/>
-        <ModalDialog open={false} message={'You are not connected. You should connect to Metamask'}/>
-        <ModalDialog open={false} message={'You are not connected. You should connect to Metamask'}/>
+        <Dialog isOpen={isOpenDialog} onClose={onCloseDialog} message={'You should agree to commit JURY'}/>
             <Flex>
                 <Spacer/>
                 <ConnectButton handleOpenModal={onOpen} />
@@ -50,7 +67,7 @@ export default function Layout() {
             <Box h="30px" w="100%"></Box>
             <Flex w="100%" justifyContent="center">
                 <Box>
-                    <Checkbox color="gray.400" fontSize="60px">
+                    <Checkbox onChange={handleCheck} color="gray.400" fontSize="60px">
                         Ask token holder to commit to JURY protocol
                     </Checkbox>
                 </Box>
@@ -63,8 +80,9 @@ export default function Layout() {
                 </Flex>
                 <Box w="50%">
                     <Input
-                        // onClick={confirmCheck}
-                           placeholder="0" w="200px" ml="50px" color="gray.400"/>
+                        onClick={handleClick}
+                        onChange={handleInputAmount}
+                           placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -74,7 +92,7 @@ export default function Layout() {
                     Old balance
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder={state.balance?(state.balance).toString():'0'} w="200px" ml="50px" color="gray.400"/>
+                    <Input onClick={handleClick} readOnly={true} placeholder={oldBalance.toString()} w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -84,7 +102,7 @@ export default function Layout() {
                     New balance
                 </Flex>
                 <Box w="50%">
-                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
+                    <Input onClick={handleClick} readOnly={true} placeholder={newBalance.toString()} w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -94,7 +112,7 @@ export default function Layout() {
                     New commit balance
                 </Flex>
                 <Flex w="50%">
-                    <Input placeholder="0" w="200px" ml="50px" color="gray.400"/>
+                    <Input readOnly={true} placeholder="0" w="200px" ml="50px" color="gray.400"/>
                     <Flex color="gray.400" alignItems="center" ml="20px">
                         store in database
                     </Flex>

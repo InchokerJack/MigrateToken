@@ -6,17 +6,16 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay,
-    useDisclosure
+    ModalOverlay
 } from "@chakra-ui/react";
-import {useEffect} from "react";
+
 interface Iprops {
-    message:string;
-    open: boolean
+    message: string;
+    isOpen: boolean;
+    onClose: any
 }
-export default function ModalDialog({message,open}:Iprops) {
-    const {isOpen, onOpen, onClose} = useDisclosure()
-    if(open) {onOpen()}
+
+export default function Dialog({message, isOpen, onClose}: Iprops) {
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
