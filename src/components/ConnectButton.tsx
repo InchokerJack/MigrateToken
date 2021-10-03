@@ -4,10 +4,10 @@ import {InjectedConnector} from '@web3-react/injected-connector'
 import {useWeb3React} from "@web3-react/core"
 import Web3 from 'web3'
 import {BSCTestNetUrl} from '../config'
-import {useContext, useEffect, useState} from "react";
-import {actionType, StoreContext} from "../App";
-import * as tokenMigration from '../config/token_migration.json';
+import {useContext, useEffect} from "react";
+import {StoreContext} from "../App";
 import getBlockchain from "../ethereum";
+import {BigNumber} from "ethers";
 
 export const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42],
@@ -36,26 +36,28 @@ export default function ConnectButton({handleOpenModal, setETHBalance}: Props) {
             // balance = balance/Math.pow(10,18)
             // dispatch({type: actionType.NEW_ADDRESS, metaData: {address: walletAddress[0], balance}})
             try {
-                const {token_migration,oldSpon} = await getBlockchain();
+                const {token_migration, oldSpon} = await getBlockchain();
                 const giftAddress = await token_migration.getOwnerGiftAddress()
-                console.log(giftAddress)
                 const walletAddress = await token_migration.getuserAddress()
                 const oldBal = await token_migration.oldSponBalance(walletAddress)
-                // oldBal =(parseInt(oldBal)/10**18)
+                const result2 = await token_migration.getUserCommittedBalance(walletAddress)
+                console.log((result2/10**18).toString())
+                // oldBal = (parseInt(oldBal) / 10 ** 18).toString()
                 let newBal = await token_migration.newSponBalance(walletAddress)
-                newBal =(parseInt(newBal)/10**18)
+                newBal = (parseInt(newBal) / 10 ** 18).toString()
                 console.log('new balance is', newBal)
-                console.log('old balance is', oldBal)
-                const result = await oldSpon.approve("0x2D51921170B69c07329cF203C53d3F031588A829", oldBal)
+                console.log('old balance is', oldBal.toString())
+                const result = await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", oldBal.toString()  )
                 console.log('result is', result)
-                await token_migration.swapToken('500');
+                setTimeout(async ()=>{await token_migration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));},10000)
 
             } catch (e) {
-                console.log('error is',e)
+                console.log('error is', e)
                 // }
                 // }
             }
         }
+
         getBalance()
     }, [])
 
