@@ -10,8 +10,9 @@ interface State {
     address?: string | null;
     askConnect?: boolean;
     askAgree?: boolean;
-    check?:boolean;
-    finishFetch?:boolean;
+    check?: boolean;
+    finishFetch?: boolean;
+    newBalance?: number;
 }
 
 const initialState: State = {
@@ -20,8 +21,9 @@ const initialState: State = {
     message: "",
     askConnect: false,
     askAgree: false,
-    check:false,
-    finishFetch:false,
+    check: false,
+    finishFetch: false,
+    newBalance: 0,
 }
 
 interface Actions {
@@ -31,8 +33,9 @@ interface Actions {
     address?: string | null;
     askConnect?: boolean;
     askAgree?: boolean;
-    check?:boolean;
-    finishFetch?:boolean;
+    check?: boolean;
+    finishFetch?: boolean;
+    newBalance?: number;
 }
 
 export enum actionType {
@@ -50,7 +53,8 @@ const reducer = (state: State, action: Actions) => {
             return {
                 ...state,
                 address: action.address,
-                balance: action.balance
+                balance: action.balance,
+                newBalance: action.newBalance
             }
         case actionType.SET_BALANCE:
             return {
@@ -70,13 +74,13 @@ const reducer = (state: State, action: Actions) => {
         case actionType.CHECK:
             return {
                 ...state,
-                check:true
+                check: true
             }
         case actionType.FINISH_FETCH:
             const temp = state.finishFetch
             return {
                 ...state,
-                finishFetch:!temp
+                finishFetch: !temp
             }
     }
 }

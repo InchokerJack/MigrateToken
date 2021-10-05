@@ -24,6 +24,16 @@ export default function Layout() {
         onOpen: onOpenDialog3,
         onClose: onCloseDialog3
     } = useDisclosure()
+    const {
+        isOpen: isOpenDialog4,
+        onOpen: onOpenDialog4,
+        onClose: onCloseDialog4
+    } = useDisclosure()
+    const {
+        isOpen: isOpenDialog5,
+        onOpen: onOpenDialog5,
+        onClose: onCloseDialog5
+    } = useDisclosure()
     const {state, dispatch} = useContext(StoreContext)
     const [check, setCheck] = useState(false)
     const oldBalance = state.balance ? state.balance : 0
@@ -54,7 +64,11 @@ export default function Layout() {
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            setNewBalance(oldBalance - commitAmount)
+            const newBalance: number = oldBalance - commitAmount;
+            setNewBalance(newBalance)
+            if(newBalance<0){
+                onOpenDialog4()
+            }
         }, 2000)
         return () => clearTimeout(timeout)
     }, [commitAmount])
@@ -66,13 +80,18 @@ export default function Layout() {
         await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
         setTimeout(async () => {
             await tokenMigration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));
-        //show please wait for 20 seconds and then check your wallet to confirm the new balance
-            //4pm ist
+        setTimeout(()=>{
+            onOpenDialog5()
+        },20000)
         }, 20000)
     }
 
     return (
         <Box bg="gray.800" h="100vh" w="100%">
+            <Dialog isOpen={isOpenDialog4} onClose={onCloseDialog4}
+                    message={'Insufficient Remaining Balance'}/>
+            <Dialog isOpen={isOpenDialog5} onClose={onCloseDialog5}
+                    message={'Please wait another 20 seconds and check your NSPON token at the button top right'}/>
             <Dialog isOpen={isOpenDialog} onClose={onCloseDialog}
                     message={'You should check on "Ask token holder to commit to JURY protocol" to continue swapping'}/>
             <Dialog isOpen={isOpenDialog2} onClose={onCloseDialog2}
@@ -82,7 +101,7 @@ export default function Layout() {
                         href="https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain">click
                         here</a></>}/>
             <Dialog isOpen={isOpenDialog3} onClose={onCloseDialog3}
-                    message={'Please Approve your transaction, the migration will take place within 20 seconds'}/>
+                    message={'Please ppprove your transaction, the migration will take place within 20 seconds'}/>
             <Flex>
                 <Spacer/>
                 <ConnectButton handleOpenModal={onOpen}/>
@@ -146,7 +165,7 @@ export default function Layout() {
                     New commit balance
                 </Flex>
                 <Flex w="50%">
-                    <Input readOnly={true} placeholder="0" w="200px" ml="50px" color="gray.400"/>
+                    <Input readOnly={true} placeholder={newBalance.toString()} w="200px" ml="50px" color="gray.400"/>
                     <Flex color="gray.400" alignItems="center" ml="20px">
                         store in database
                     </Flex>

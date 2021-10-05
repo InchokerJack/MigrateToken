@@ -15,9 +15,7 @@ type Props = {
 };
 
 export default function ConnectButton({handleOpenModal}: Props) {
-    const {activate, deactivate} = useWeb3React()
     const [count, setCount] = useState(0)
-    // const web3 = new Web3(Web3.givenProvider || BSCTestNetUrl);
     const {state, dispatch} = useContext(StoreContext)
     useEffect(() => {
         async function getWalletAddressAndBalance() {
@@ -26,8 +24,9 @@ export default function ConnectButton({handleOpenModal}: Props) {
             const walletAddress = await tokenMigration.getuserAddress()
             let oldBal = await tokenMigration.oldSponBalance(walletAddress)
             oldBal = oldBal/10**18
-            const newBal = await tokenMigration.newSponBalance(walletAddress)
-            dispatch({type:actionType.NEW_ADDRESS, address:walletAddress,balance:oldBal})
+            let newBal = await tokenMigration.newSponBalance(walletAddress)
+            newBal = newBal/10**18;
+            dispatch({type:actionType.NEW_ADDRESS, address:walletAddress,balance:oldBal, newBalance:newBal})
             } catch (e) {
                 if(e='Install Metamask'){
                    dispatch({type:actionType.FINISH_FETCH})
@@ -42,30 +41,6 @@ export default function ConnectButton({handleOpenModal}: Props) {
     async function handleConnectWallet() {
         setCount((count)=> count+1)
     }
-
-    useEffect(() => {
-        async function getBalance() {
-            try {
-
-                //     const oldBal = await tokenMigration.oldSponBalance(walletAddress)
-                //     const result2 = await tokenMigration.getUserCommittedBalance(walletAddress)
-                //     console.log((result2/10**18).toString())
-                //     // oldBal = (parseInt(oldBal) / 10 ** 18).toString()
-                //     let newBal = await tokenMigration.newSponBalance(walletAddress)
-                //     newBal = (parseInt(newBal) / 10 ** 18).toString()
-                //     console.log('new balance is', newBal)
-                //     console.log('old balance is', oldBal.toString())
-                //     const result = await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", oldBal.toString()  )
-                //     console.log('result is', result)
-                //     setTimeout(async ()=>{await tokenMigration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));},10000)
-                //
-            } catch (e) {
-                alert('Please login Metamask')
-            }
-        }
-
-        getBalance()
-    }, [])
 
     return state.address ? (
         <Box

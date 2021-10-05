@@ -97,6 +97,18 @@ export default function AccountModal({ isOpen, onClose }: Props) {
                 {`${state.balance} OSPON`}
               </Text>
             </Flex>
+            <Flex alignItems="center" mt={2} mb={4} lineHeight={1}>
+              <Identicon />
+              <Text
+                  color="white"
+                  fontSize="xl"
+                  fontWeight="semibold"
+                  ml="2"
+                  lineHeight="1.1"
+              >
+                {`${state.newBalance} NSPON`}
+              </Text>
+            </Flex>
             <Flex alignContent="center" m={3}>
               {/*<Button*/}
               {/*  variant="link"*/}
