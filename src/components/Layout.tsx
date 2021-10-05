@@ -75,17 +75,21 @@ export default function Layout() {
     }, [commitAmount])
 
     async function handleMigrate() {
-        const {tokenMigration, oldSpon} = await getBlockchain();
-        onOpenDialog3()
-        const balance = BigNumber.from(state.balance).mul(BigNumber.from(10).pow(18))
-        await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
-        setTimeout(async () => {
-            onOpenDialog5()
-            await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
-            setTimeout(() => {
-                updateBalance(tokenMigration)
+        try {
+            const {tokenMigration, oldSpon} = await getBlockchain();
+            onOpenDialog3()
+            const balance = BigNumber.from(state.balance).mul(BigNumber.from(10).pow(18))
+            await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
+            setTimeout(async () => {
+                onOpenDialog5()
+                await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
+                setTimeout(() => {
+                    updateBalance(tokenMigration)
+                }, 20000)
             }, 20000)
-        }, 20000)
+        }catch (e) {
+            alert(`Interrupted with error ${e}`)
+        }
     }
 
     async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any }) {
