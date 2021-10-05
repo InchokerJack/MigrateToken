@@ -2,7 +2,7 @@ import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, useDisclosure,} fro
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {StoreContext} from "../App";
+import {actionType, StoreContext} from "../App";
 import Dialog from "./Dialog";
 import getBlockchain from "../ethereum";
 import {BigNumber} from "ethers";
@@ -79,9 +79,17 @@ export default function Layout() {
         const balance = BigNumber.from(state.balance).mul(BigNumber.from(10).pow(18))
         await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
         setTimeout(async () => {
-            await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
         onOpenDialog5()
+        await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
         }, 20000)
+        await updateBalance(tokenMigration)
+    }
+
+    async function updateBalance(tokenMigration:{oldSponBalance:any, newSponBalance:any, getuserAddress:any}){
+        const walletAddress = await tokenMigration.getuserAddress()
+        const oldBal = await tokenMigration.oldSponBalance(walletAddress)/10**18
+        const newBal = await tokenMigration.newSponBalance(walletAddress)/10**18
+        dispatch({type:actionType.UPDATE_BALANCE,balance:oldBal,newBalance:newBal})
     }
 
     return (

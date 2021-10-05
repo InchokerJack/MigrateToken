@@ -44,7 +44,8 @@ export enum actionType {
     ASK_CONNECT = 'ASK_CONNECT',
     ASK_AGREE = 'ASK_AGREE',
     CHECK = 'CHECK',
-    FINISH_FETCH = 'FINISH_FETCH'
+    FINISH_FETCH = 'FINISH_FETCH',
+    UPDATE_BALANCE = 'UPDATE_BALANCE',
 }
 
 const reducer = (state: State, action: Actions) => {
@@ -81,6 +82,12 @@ const reducer = (state: State, action: Actions) => {
             return {
                 ...state,
                 finishFetch: !temp
+            }
+        case actionType.UPDATE_BALANCE:
+            return {
+                ...state,
+                balance: action.balance,
+                newBalance: action.newBalance
             }
     }
 }
