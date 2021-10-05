@@ -40,6 +40,7 @@ export default function Layout() {
     const [commitAmount, setCommitAmount] = useState(0)
     const [newBalance, setNewBalance] = useState(0)
     const initailRender = useRef(true)
+    const [isMigrateDisable, setMigrateDisable] = useState(false)
 
     function handleInputAmount(e: React.FormEvent<HTMLInputElement>) {
         const value = e.currentTarget.value || '0'
@@ -91,6 +92,13 @@ export default function Layout() {
             alert(`Interrupted with error ${e}`)
         }
     }
+
+    useEffect(()=>{
+        console.log('here')
+        if(oldBalance==0){
+            setMigrateDisable(true)
+        }
+    },[oldBalance])
 
     async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any }) {
         const walletAddress = await tokenMigration.getuserAddress()
@@ -190,7 +198,7 @@ export default function Layout() {
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Button w="100px" onClick={handleMigrate}>Migrate</Button>
+                <Button w="100px" isDisabled={isMigrateDisable} onClick={handleMigrate}>Migrate</Button>
                 <Button w="100px" ml="15px" onClick={handleClear}>Clear</Button>
             </Flex>
         </Box>
