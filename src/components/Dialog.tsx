@@ -8,9 +8,9 @@ import {
     ModalHeader,
     ModalOverlay
 } from "@chakra-ui/react";
-
+import React from "react";
 interface Iprops {
-    message: string;
+    message: string|React.ReactNode;
     isOpen: boolean;
     onClose: any
 }

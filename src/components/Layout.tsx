@@ -1,8 +1,8 @@
 import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, useDisclosure,} from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
-import React, {useContext, useEffect, useState} from "react";
-import {actionType, StoreContext} from "../App";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {StoreContext} from "../App";
 import Dialog from "./Dialog";
 import getBlockchain from "../ethereum";
 import {BigNumber} from "ethers";
@@ -14,46 +14,78 @@ export default function Layout() {
         onOpen: onOpenDialog,
         onClose: onCloseDialog
     } = useDisclosure()
-    const {state,dispatch} = useContext(StoreContext)
-    const [check,setCheck] = useState(false)
-    const oldBalance = state.balance?state.balance:0
+    const {
+        isOpen: isOpenDialog2,
+        onOpen: onOpenDialog2,
+        onClose: onCloseDialog2
+    } = useDisclosure()
+    const {
+        isOpen: isOpenDialog3,
+        onOpen: onOpenDialog3,
+        onClose: onCloseDialog3
+    } = useDisclosure()
+    const {state, dispatch} = useContext(StoreContext)
+    const [check, setCheck] = useState(false)
+    const oldBalance = state.balance ? state.balance : 0
     const [commitAmount, setCommitAmount] = useState(0)
     const [newBalance, setNewBalance] = useState(0)
+    const initailRender = useRef(true)
 
-    function handleInputAmount(e: React.FormEvent<HTMLInputElement>){
+    function handleInputAmount(e: React.FormEvent<HTMLInputElement>) {
         const value = e.currentTarget.value || '0'
         setCommitAmount(parseFloat(value))
     }
 
-    function handleClick(){
-        if(!check){
+    function handleClick() {
+        if (!check) {
             onOpenDialog()
         }
     }
 
-    function handleCheck(e: React.FormEvent<HTMLDivElement>){
-        setCheck((check)=>!check)
+    function handleCheck(e: React.FormEvent<HTMLDivElement>) {
+        setCheck((check) => !check)
     }
-
     useEffect(()=>{
-        const timeout = setTimeout(()=>{
-           setNewBalance(oldBalance-commitAmount)},2000)
-        return ()=>clearTimeout(timeout)
-    },[commitAmount])
+        if(!initailRender.current){
+        onOpenDialog2()
+        }
+        initailRender.current=false;
+    },[state.finishFetch])
 
-    async function handleMigrate(){
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setNewBalance(oldBalance - commitAmount)
+        }, 2000)
+        return () => clearTimeout(timeout)
+    }, [commitAmount])
+
+    async function handleMigrate() {
         const {tokenMigration, oldSpon} = await getBlockchain();
-            const result = await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", state.balance )
-            console.log('result is', result)
-            setTimeout(async ()=>{await tokenMigration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));},10000)
+        onOpenDialog3()
+        const balance = BigNumber.from(state.balance).mul(BigNumber.from(10).pow(18))
+        await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
+        setTimeout(async () => {
+            await tokenMigration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));
+        //show please wait for 20 seconds and then check your wallet to confirm the new balance
+            //4pm ist
+        }, 20000)
     }
 
     return (
         <Box bg="gray.800" h="100vh" w="100%">
-        <Dialog isOpen={isOpenDialog} onClose={onCloseDialog} message={'You should agree to commit JURY'}/>
+            <Dialog isOpen={isOpenDialog} onClose={onCloseDialog}
+                    message={'You should check on "Ask token holder to commit to JURY protocol" to continue swapping'}/>
+            <Dialog isOpen={isOpenDialog2} onClose={onCloseDialog2}
+                    message={<><span>You are not connecting to a Metamask account. To know how to do it, </span><a
+                        target="_blank" rel="noopener noreferrer"
+                        style={{color: "blue", fontStyle: "italic", textDecoration: "underline"}}
+                        href="https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain">click
+                        here</a></>}/>
+            <Dialog isOpen={isOpenDialog3} onClose={onCloseDialog3}
+                    message={'Please Approve your transaction, the migration will take place within 20 seconds'}/>
             <Flex>
                 <Spacer/>
-                <ConnectButton handleOpenModal={onOpen} />
+                <ConnectButton handleOpenModal={onOpen}/>
                 <AccountModal isOpen={isOpen} onClose={onClose}/>
             </Flex>
             <Box h="100px" w="100%"></Box>
@@ -82,7 +114,7 @@ export default function Layout() {
                     <Input
                         onClick={handleClick}
                         onChange={handleInputAmount}
-                           placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
+                        placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -92,7 +124,8 @@ export default function Layout() {
                     Old balance
                 </Flex>
                 <Box w="50%">
-                    <Input onClick={handleClick} readOnly={true} placeholder={oldBalance.toString()} w="200px" ml="50px" color="gray.400"/>
+                    <Input onClick={handleClick} readOnly={true} placeholder={oldBalance.toString()} w="200px" ml="50px"
+                           color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
@@ -102,7 +135,8 @@ export default function Layout() {
                     New balance
                 </Flex>
                 <Box w="50%">
-                    <Input onClick={handleClick} readOnly={true} placeholder={newBalance.toString()} w="200px" ml="50px" color="gray.400"/>
+                    <Input onClick={handleClick} readOnly={true} placeholder={newBalance.toString()} w="200px" ml="50px"
+                           color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>

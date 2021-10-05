@@ -11,6 +11,7 @@ interface State {
     askConnect?: boolean;
     askAgree?: boolean;
     check?:boolean;
+    finishFetch?:boolean;
 }
 
 const initialState: State = {
@@ -20,11 +21,18 @@ const initialState: State = {
     askConnect: false,
     askAgree: false,
     check:false,
+    finishFetch:false,
 }
 
 interface Actions {
     type: actionType,
-    metaData: State,
+    message?: string;
+    balance?: number;
+    address?: string | null;
+    askConnect?: boolean;
+    askAgree?: boolean;
+    check?:boolean;
+    finishFetch?:boolean;
 }
 
 export enum actionType {
@@ -33,6 +41,7 @@ export enum actionType {
     ASK_CONNECT = 'ASK_CONNECT',
     ASK_AGREE = 'ASK_AGREE',
     CHECK = 'CHECK',
+    FINISH_FETCH = 'FINISH_FETCH'
 }
 
 const reducer = (state: State, action: Actions) => {
@@ -40,13 +49,13 @@ const reducer = (state: State, action: Actions) => {
         case actionType.NEW_ADDRESS:
             return {
                 ...state,
-                address: action.metaData.address,
-                balance: action.metaData.balance
+                address: action.address,
+                balance: action.balance
             }
         case actionType.SET_BALANCE:
             return {
                 ...state,
-                ...action.metaData.balance && {balance: action.metaData.balance},
+                ...action.balance && {balance: action.balance},
             }
         case actionType.ASK_CONNECT:
             return {
@@ -62,6 +71,12 @@ const reducer = (state: State, action: Actions) => {
             return {
                 ...state,
                 check:true
+            }
+        case actionType.FINISH_FETCH:
+            const temp = state.finishFetch
+            return {
+                ...state,
+                finishFetch:!temp
             }
     }
 }

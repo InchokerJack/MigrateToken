@@ -1,7 +1,7 @@
 import {Box, Button, Text} from "@chakra-ui/react";
 import Identicon from "./Identicon";
 import {InjectedConnector} from '@web3-react/injected-connector'
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useState} from "react";
 import {actionType, StoreContext} from "../App";
 import getBlockchain from "../ethereum";
 import {useWeb3React} from "@web3-react/core";
@@ -16,29 +16,31 @@ type Props = {
 
 export default function ConnectButton({handleOpenModal}: Props) {
     const {activate, deactivate} = useWeb3React()
+    const [count, setCount] = useState(0)
     // const web3 = new Web3(Web3.givenProvider || BSCTestNetUrl);
     const {state, dispatch} = useContext(StoreContext)
     useEffect(() => {
         async function getWalletAddressAndBalance() {
+            try {
             const {tokenMigration, oldSpon} = await getBlockchain();
             const walletAddress = await tokenMigration.getuserAddress()
             let oldBal = await tokenMigration.oldSponBalance(walletAddress)
             oldBal = oldBal/10**18
-            dispatch({type:actionType.NEW_ADDRESS, metaData: {address:walletAddress,balance:oldBal}})
+            const newBal = await tokenMigration.newSponBalance(walletAddress)
+            dispatch({type:actionType.NEW_ADDRESS, address:walletAddress,balance:oldBal})
+            } catch (e) {
+                if(e='Install Metamask'){
+                   dispatch({type:actionType.FINISH_FETCH})
+                } else {
+                alert("Metamask is running in background, please click on Metamask extension to continue processing procedure")
+                }
+            }
         }
         getWalletAddressAndBalance()
-    },[])
+    },[count])
 
     async function handleConnectWallet() {
-        await connect();
-    }
-
-    async function connect() {
-        try {
-            await activate(injected)
-        } catch (ex) {
-            console.log(ex)
-        }
+        setCount((count)=> count+1)
     }
 
     useEffect(() => {
@@ -64,14 +66,6 @@ export default function ConnectButton({handleOpenModal}: Props) {
 
         getBalance()
     }, [])
-
-    // async function disconnect() {
-    //     try {
-    //         deactivate()
-    //     } catch (ex) {
-    //         console.log(ex)
-    //     }
-    // }
 
     return state.address ? (
         <Box
