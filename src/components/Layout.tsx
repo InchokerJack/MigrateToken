@@ -55,18 +55,19 @@ export default function Layout() {
     function handleCheck(e: React.FormEvent<HTMLDivElement>) {
         setCheck((check) => !check)
     }
-    useEffect(()=>{
-        if(!initailRender.current){
-        onOpenDialog2()
+
+    useEffect(() => {
+        if (!initailRender.current) {
+            onOpenDialog2()
         }
-        initailRender.current=false;
-    },[state.finishFetch])
+        initailRender.current = false;
+    }, [state.finishFetch])
 
     useEffect(() => {
         const timeout = setTimeout(() => {
             const newBalance: number = oldBalance - commitAmount;
             setNewBalance(newBalance)
-            if(newBalance<0){
+            if (newBalance < 0) {
                 onOpenDialog4()
             }
         }, 2000)
@@ -79,17 +80,23 @@ export default function Layout() {
         const balance = BigNumber.from(state.balance).mul(BigNumber.from(10).pow(18))
         await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
         setTimeout(async () => {
-        onOpenDialog5()
-        await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
+            onOpenDialog5()
+            await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
+            setTimeout(() => {
+                updateBalance(tokenMigration)
+            }, 20000)
         }, 20000)
-        await updateBalance(tokenMigration)
     }
 
-    async function updateBalance(tokenMigration:{oldSponBalance:any, newSponBalance:any, getuserAddress:any}){
+    async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any }) {
         const walletAddress = await tokenMigration.getuserAddress()
-        const oldBal = await tokenMigration.oldSponBalance(walletAddress)/10**18
-        const newBal = await tokenMigration.newSponBalance(walletAddress)/10**18
-        dispatch({type:actionType.UPDATE_BALANCE,balance:oldBal,newBalance:newBal})
+        const oldBal = await tokenMigration.oldSponBalance(walletAddress) / 10 ** 18
+        const newBal = await tokenMigration.newSponBalance(walletAddress) / 10 ** 18
+        dispatch({type: actionType.UPDATE_BALANCE, balance: oldBal, newBalance: newBal})
+    }
+
+    function handleClear(){
+        window.location.reload()
     }
 
     return (
@@ -97,7 +104,7 @@ export default function Layout() {
             <Dialog isOpen={isOpenDialog4} onClose={onCloseDialog4}
                     message={'Insufficient Remaining Balance'}/>
             <Dialog isOpen={isOpenDialog5} onClose={onCloseDialog5}
-                    message={'Please wait another 20 seconds and check your NSPON token at the button top right'}/>
+                    message={'Please approve the swap, wait another 20 seconds and check your NSPON token at the button top right'}/>
             <Dialog isOpen={isOpenDialog} onClose={onCloseDialog}
                     message={'You should check on "Ask token holder to commit to JURY protocol" to continue swapping'}/>
             <Dialog isOpen={isOpenDialog2} onClose={onCloseDialog2}
@@ -180,6 +187,7 @@ export default function Layout() {
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
                 <Button w="100px" onClick={handleMigrate}>Migrate</Button>
+                <Button w="100px" ml="15px" onClick={handleClear}>Clear</Button>
             </Flex>
         </Box>
     );
