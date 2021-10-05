@@ -79,10 +79,8 @@ export default function Layout() {
         const balance = BigNumber.from(state.balance).mul(BigNumber.from(10).pow(18))
         await oldSpon.approve("0xeA97E22234B5b5c71A8721C469273baa1ACFE4bd", balance.toString())
         setTimeout(async () => {
-            await tokenMigration.swapToken(BigNumber.from(500).mul(BigNumber.from(10).pow(18)));
-        setTimeout(()=>{
-            onOpenDialog5()
-        },20000)
+            await tokenMigration.swapToken(BigNumber.from(commitAmount).mul(BigNumber.from(10).pow(18)));
+        onOpenDialog5()
         }, 20000)
     }
 
@@ -101,7 +99,7 @@ export default function Layout() {
                         href="https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain">click
                         here</a></>}/>
             <Dialog isOpen={isOpenDialog3} onClose={onCloseDialog3}
-                    message={'Please ppprove your transaction, the migration will take place within 20 seconds'}/>
+                    message={'Please appprove your transaction, the migration will take place within 20 seconds'}/>
             <Flex>
                 <Spacer/>
                 <ConnectButton handleOpenModal={onOpen}/>
