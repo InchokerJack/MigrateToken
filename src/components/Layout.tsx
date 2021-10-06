@@ -94,17 +94,21 @@ export default function Layout() {
     }
 
     useEffect(()=>{
-        console.log('here')
         if(oldBalance==0){
             setMigrateDisable(true)
         }
+        if(oldBalance!=0){
+            setMigrateDisable(false)
+        }
     },[oldBalance])
 
-    async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any }) {
+    async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any, getUserCommittedBalance:any }) {
         const walletAddress = await tokenMigration.getuserAddress()
         const oldBal = await tokenMigration.oldSponBalance(walletAddress) / 10 ** 18
         const newBal = await tokenMigration.newSponBalance(walletAddress) / 10 ** 18
+        const commmitBalance = await tokenMigration.getUserCommittedBalance(walletAddress)/10**18
         dispatch({type: actionType.UPDATE_BALANCE, balance: oldBal, newBalance: newBal})
+        dispatch({type: actionType.UPDATE_COMMIT_BALANCE, commitBalance: commmitBalance})
     }
 
     function handleClear(){
@@ -190,7 +194,7 @@ export default function Layout() {
                     New commit balance
                 </Flex>
                 <Flex w="50%">
-                    <Input readOnly={true} placeholder={newBalance.toString()} w="200px" ml="50px" color="gray.400"/>
+                    <Input readOnly={true} placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
                     <Flex color="gray.400" alignItems="center" ml="20px">
                         store in database
                     </Flex>

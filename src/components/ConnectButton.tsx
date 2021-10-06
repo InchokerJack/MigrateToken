@@ -1,14 +1,10 @@
 import {Box, Button, Text} from "@chakra-ui/react";
 import Identicon from "./Identicon";
-import {InjectedConnector} from '@web3-react/injected-connector'
 import {useContext, useEffect, useState} from "react";
 import {actionType, StoreContext} from "../App";
 import getBlockchain from "../ethereum";
-import {useWeb3React} from "@web3-react/core";
+import {BigNumber} from "ethers";
 
-export const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42],
-})
 
 type Props = {
     handleOpenModal: any;
@@ -20,26 +16,32 @@ export default function ConnectButton({handleOpenModal}: Props) {
     useEffect(() => {
         async function getWalletAddressAndBalance() {
             try {
-            const {tokenMigration, oldSpon} = await getBlockchain();
-            const walletAddress = await tokenMigration.getuserAddress()
-            let oldBal = await tokenMigration.oldSponBalance(walletAddress)
-            oldBal = oldBal/10**18
-            let newBal = await tokenMigration.newSponBalance(walletAddress)
-            newBal = newBal/10**18;
-            dispatch({type:actionType.NEW_ADDRESS, address:walletAddress,balance:oldBal, newBalance:newBal})
+                const {tokenMigration, oldSpon} = await getBlockchain();
+                const walletAddress = await tokenMigration.getuserAddress()
+                let oldBal = await tokenMigration.oldSponBalance(walletAddress)
+                oldBal = BigNumber.from(oldBal).div(BigNumber.from(10).pow(18))
+                let newBal = await tokenMigration.newSponBalance(walletAddress)
+                newBal = BigNumber.from(newBal).div(BigNumber.from(10).pow(18))
+                let commmitBalance = await tokenMigration.getUserCommittedBalance(walletAddress)
+                commmitBalance = BigNumber.from(commmitBalance).div(BigNumber.from(10).pow(18))
+                dispatch({type:actionType.UPDATE_COMMIT_BALANCE, commitBalance: commmitBalance})
+                dispatch({type: actionType.NEW_ADDRESS, address: walletAddress, balance: oldBal, newBalance: newBal})
             } catch (e) {
-                if(e='Install Metamask'){
-                   dispatch({type:actionType.FINISH_FETCH})
+                if ((e as any).message == 'Install Metamask') {
+                    dispatch({type: actionType.FINISH_FETCH})
+                } else if ((e as any).message == 'Please connect to BSC testnet') {
+                    alert('You should connect to BSC testnet')
                 } else {
-                alert("Metamask is running in background, please click on Metamask extension to continue processing procedure")
+                    alert("Metamask is running in background, please click on Metamask extension to continue processing procedure")
                 }
             }
         }
+
         getWalletAddressAndBalance()
-    },[count])
+    }, [count])
 
     async function handleConnectWallet() {
-        setCount((count)=> count+1)
+        setCount((count) => count + 1)
     }
 
     return state.address ? (

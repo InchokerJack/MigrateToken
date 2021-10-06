@@ -3,6 +3,7 @@ import theme from "./theme";
 import Layout from "./components/Layout";
 import "@fontsource/inter";
 import {createContext, Dispatch, useReducer} from "react";
+import {BigNumber} from "ethers";
 
 interface State {
     message?: string;
@@ -13,6 +14,7 @@ interface State {
     check?: boolean;
     finishFetch?: boolean;
     newBalance?: number;
+    commitBalance?:number|BigNumber;
 }
 
 const initialState: State = {
@@ -24,6 +26,7 @@ const initialState: State = {
     check: false,
     finishFetch: false,
     newBalance: 0,
+    commitBalance: 0,
 }
 
 interface Actions {
@@ -36,6 +39,7 @@ interface Actions {
     check?: boolean;
     finishFetch?: boolean;
     newBalance?: number;
+    commitBalance?:number|BigNumber;
 }
 
 export enum actionType {
@@ -46,6 +50,7 @@ export enum actionType {
     CHECK = 'CHECK',
     FINISH_FETCH = 'FINISH_FETCH',
     UPDATE_BALANCE = 'UPDATE_BALANCE',
+    UPDATE_COMMIT_BALANCE='UPDATE_COMMIT_BALANCE',
 }
 
 const reducer = (state: State, action: Actions) => {
@@ -88,6 +93,11 @@ const reducer = (state: State, action: Actions) => {
                 ...state,
                 balance: action.balance,
                 newBalance: action.newBalance
+            }
+        case actionType.UPDATE_COMMIT_BALANCE:
+            return {
+                ...state,
+                commitBalance: action.commitBalance
             }
     }
 }
