@@ -1,4 +1,4 @@
-import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, useDisclosure,} from "@chakra-ui/react";
+import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, Tooltip, useDisclosure,} from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
 import React, {useContext, useEffect, useRef, useState} from "react";
@@ -34,6 +34,11 @@ export default function Layout() {
         onOpen: onOpenDialog5,
         onClose: onCloseDialog5
     } = useDisclosure()
+    const {
+        isOpen: isOpenDialog6,
+        onOpen: onOpenDialog6,
+        onClose: onCloseDialog6
+    } = useDisclosure()
     const {state, dispatch} = useContext(StoreContext)
     const [check, setCheck] = useState(false)
     const oldBalance = state.balance ? state.balance : 0
@@ -43,8 +48,8 @@ export default function Layout() {
     const [isMigrateDisable, setMigrateDisable] = useState(false)
 
     function handleInputAmount(e: React.FormEvent<HTMLInputElement>) {
-        const value = e.currentTarget.value || '0'
-        setCommitAmount(parseFloat(value))
+        const value = e.currentTarget.value
+        setCommitAmount(parseFloat(value)||0)
     }
 
     function handleClick() {
@@ -65,14 +70,21 @@ export default function Layout() {
     }, [state.finishFetch])
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            const newBalance: number = oldBalance - commitAmount;
-            setNewBalance(newBalance)
-            if (newBalance < 0) {
-                onOpenDialog4()
-            }
-        }, 1000)
-        return () => clearTimeout(timeout)
+        if(!initailRender.current){
+            const timeout = setTimeout(() => {
+                const newBalance: number = oldBalance - commitAmount;
+                setNewBalance(newBalance)
+                if (newBalance < 0) {
+                    setMigrateDisable(true)
+                    onOpenDialog4()
+                }
+                if(commitAmount<0){
+                    setMigrateDisable(true)
+                    onOpenDialog6()
+                }
+            }, 1000)
+            return () => clearTimeout(timeout)
+        }
     }, [commitAmount])
 
     async function handleMigrate() {
@@ -119,6 +131,8 @@ export default function Layout() {
         <Box bg="gray.800" h="100vh" w="100%">
             <Dialog isOpen={isOpenDialog4} onClose={onCloseDialog4}
                     message={'Insufficient Remaining Balance'}/>
+            <Dialog isOpen={isOpenDialog6} onClose={onCloseDialog6}
+                    message={'Amount should be larger than 0'}/>
             <Dialog isOpen={isOpenDialog5} onClose={onCloseDialog5}
                     message={'Please approve the swap, wait another 20 seconds and check your NSPON token at the button top right'}/>
             <Dialog isOpen={isOpenDialog} onClose={onCloseDialog}
@@ -154,10 +168,12 @@ export default function Layout() {
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
+                <Tooltip label="Hover me" placement="top-end">
                 <Flex color="gray.400" alignItems="center" w="50%">
                     <Spacer/>
                     Amount of tokens to commit
                 </Flex>
+                </Tooltip>
                 <Box w="50%">
                     <Input
                         onClick={handleClick}
@@ -196,7 +212,6 @@ export default function Layout() {
                 <Flex w="50%">
                     <Input readOnly={true} placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
                     <Flex color="gray.400" alignItems="center" ml="20px">
-                        store in database
                     </Flex>
                 </Flex>
             </Flex>
