@@ -2,17 +2,14 @@ import {
   Box,
   Button,
   Flex,
-  Link,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   Text,
 } from "@chakra-ui/react";
-import { ExternalLinkIcon, CopyIcon } from "@chakra-ui/icons";
 import Identicon from "./Identicon";
 import {useWeb3React} from "@web3-react/core";
 import {useContext} from "react";
@@ -24,7 +21,6 @@ type Props = {
 };
 
 export default function AccountModal({ isOpen, onClose }: Props) {
-  const {activate, deactivate } = useWeb3React()
   const {state,dispatch} = useContext(StoreContext)
   function handleDeactivateAccount() {
     onClose();

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "author": "Jacob E. Dawson",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@chakra-ui/icons": "^1.0.14",
     "@chakra-ui/react": "^1.6.5",

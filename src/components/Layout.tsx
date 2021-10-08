@@ -71,7 +71,7 @@ export default function Layout() {
             if (newBalance < 0) {
                 onOpenDialog4()
             }
-        }, 2000)
+        }, 1000)
         return () => clearTimeout(timeout)
     }, [commitAmount])
 
