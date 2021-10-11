@@ -1,4 +1,4 @@
-import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, Tooltip, useDisclosure,} from "@chakra-ui/react";
+import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, Text, Tooltip, useDisclosure,} from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
 import React, {useContext, useEffect, useRef, useState} from "react";
@@ -232,6 +232,22 @@ export default function Layout() {
             <Flex w="100%" justifyContent="center" alignItems="middle">
                 <Button w="100px" isDisabled={isMigrateDisable} onClick={handleMigrate}>Migrate</Button>
                 <Button w="100px" ml="15px" onClick={handleClear}>Clear</Button>
+            </Flex>
+            <Box h="20px" w="100%"></Box>
+            <Flex w="100%" justifyContent="center" alignItems="middle">
+                <Box color="gray.200" w="50%">
+                    <Text fontSize="lg" fontWeight="bold">**Steps for migration process :</Text>
+                    <Box h="10px" w="100%"></Box>
+                    <Text fontSize="md" >1. Connecting metamask to BSC :</Text>
+                    <Text fontSize="md">2. Check on the below checkbox:</Text>
+                    <Text fontSize="md">By checking this box, it means that you agree to commit SPON tokens to work for dataset generation of JURY protocol.</Text>
+                    <Text fontSize="md">3. Input the token amount to commit greater than 0.</Text>
+                    <Text fontSize="md">4. Check the values of old balance, new balance and new commit balance that will be updated after successful migration.</Text>
+                    <Text fontSize="md">5. Click the “migrate” button. This will pop-out an approve transaction (old SPON token balance) request in metamask. Please confirm that transaction.</Text>
+                    <Text fontSize="md">6. Close the pop-up message and  please wait for 20 seconds for the transaction to complete.</Text>
+                    <Text fontSize="md">7. There will occur a new “SWAP token” transaction request will pop-up on metamask. Please confirm the transaction and wait for 20 seconds for it to be completed.</Text>
+                    <Text fontSize="md">8. Once, transaction is completed in metamask, please check the updated New Token balance and commit balance by clicking on top right button of the web-page. Apparently, you can also check the new SPON token balance through metamask.</Text>
+                </Box>
             </Flex>
         </Box>
     );
