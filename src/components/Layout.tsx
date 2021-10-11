@@ -39,6 +39,11 @@ export default function Layout() {
         onOpen: onOpenDialog6,
         onClose: onCloseDialog6
     } = useDisclosure()
+    const {
+        isOpen: isOpenDialog7,
+        onOpen: onOpenDialog7,
+        onClose: onCloseDialog7
+    } = useDisclosure()
     const {state, dispatch} = useContext(StoreContext)
     const [check, setCheck] = useState(false)
     const oldBalance = state.balance ? state.balance : 0
@@ -49,6 +54,12 @@ export default function Layout() {
 
     function handleInputAmount(e: React.FormEvent<HTMLInputElement>) {
         const value = e.currentTarget.value
+        if (!/[0-9]/.test(value)){
+            onOpenDialog7()
+            setMigrateDisable(true)
+        } else {
+            setMigrateDisable(false)
+        }
         setCommitAmount(parseFloat(value)||0)
     }
 
@@ -131,12 +142,14 @@ export default function Layout() {
         <Box bg="gray.800" h="100vh" w="100%">
             <Dialog isOpen={isOpenDialog4} onClose={onCloseDialog4}
                     message={'Insufficient Remaining Balance'}/>
+            <Dialog isOpen={isOpenDialog7} onClose={onCloseDialog7}
+                    message={'Please input a number'}/>
             <Dialog isOpen={isOpenDialog6} onClose={onCloseDialog6}
                     message={'Amount should be larger than 0'}/>
             <Dialog isOpen={isOpenDialog5} onClose={onCloseDialog5}
                     message={'Please approve the swap, wait another 20 seconds and check your NSPON token at the button top right'}/>
             <Dialog isOpen={isOpenDialog} onClose={onCloseDialog}
-                    message={'You should check on "Ask token holder to commit to JURY protocol" to continue swapping'}/>
+                    message={'You should check on "By checking this box, it means that you agree to commit SPON tokens to work for dataset generation of JURY protocol"'}/>
             <Dialog isOpen={isOpenDialog2} onClose={onCloseDialog2}
                     message={<><span>You are not connecting to a Metamask account. To know how to do it, </span><a
                         target="_blank" rel="noopener noreferrer"
@@ -154,7 +167,7 @@ export default function Layout() {
             <Flex w="100%" justifyContent="center">
                 <Box>
                     <Heading color="gray.400" size="xl" margin="auto">
-                        Migration Webpage
+                        Sponsee Migration Webpage
                     </Heading>
                 </Box>
             </Flex>
@@ -162,7 +175,7 @@ export default function Layout() {
             <Flex w="100%" justifyContent="center">
                 <Box>
                     <Checkbox onChange={handleCheck} color="gray.400" fontSize="60px">
-                        Ask token holder to commit to JURY protocol
+                        By checking this box, it means that you agree to commit SPON tokens to work for dataset generation of JURY protocol.
                     </Checkbox>
                 </Box>
             </Flex>
