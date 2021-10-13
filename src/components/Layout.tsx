@@ -1,4 +1,16 @@
-import {Box, Button, Checkbox, Flex, Heading, Input, Spacer, Text, Tooltip, useDisclosure,} from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Checkbox,
+    Divider,
+    Flex,
+    Heading,
+    Input,
+    Spacer,
+    Text,
+    Tooltip,
+    useDisclosure,
+} from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import AccountModal from "./AccountModal";
 import React, {useContext, useEffect, useRef, useState} from "react";
@@ -54,13 +66,13 @@ export default function Layout() {
 
     function handleInputAmount(e: React.FormEvent<HTMLInputElement>) {
         const value = e.currentTarget.value
-        if (!/[0-9]/.test(value)){
+        if (!/[0-9]/.test(value)) {
             onOpenDialog7()
             setMigrateDisable(true)
         } else {
             setMigrateDisable(false)
         }
-        setCommitAmount(parseFloat(value)||0)
+        setCommitAmount(parseFloat(value) || 0)
     }
 
     function handleClick() {
@@ -81,7 +93,7 @@ export default function Layout() {
     }, [state.finishFetch])
 
     useEffect(() => {
-        if(!initailRender.current){
+        if (!initailRender.current) {
             const timeout = setTimeout(() => {
                 const newBalance: number = oldBalance - commitAmount;
                 setNewBalance(newBalance)
@@ -89,7 +101,7 @@ export default function Layout() {
                     setMigrateDisable(true)
                     onOpenDialog4()
                 }
-                if(commitAmount<0){
+                if (commitAmount < 0) {
                     setMigrateDisable(true)
                     onOpenDialog6()
                 }
@@ -111,35 +123,35 @@ export default function Layout() {
                     updateBalance(tokenMigration)
                 }, 20000)
             }, 20000)
-        }catch (e) {
+        } catch (e) {
             alert(`Interrupted with error ${e}`)
         }
     }
 
-    useEffect(()=>{
-        if(oldBalance==0){
+    useEffect(() => {
+        if (oldBalance == 0) {
             setMigrateDisable(true)
         }
-        if(oldBalance!=0){
+        if (oldBalance != 0) {
             setMigrateDisable(false)
         }
-    },[oldBalance])
+    }, [oldBalance])
 
-    async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any, getUserCommittedBalance:any }) {
+    async function updateBalance(tokenMigration: { oldSponBalance: any, newSponBalance: any, getuserAddress: any, getUserCommittedBalance: any }) {
         const walletAddress = await tokenMigration.getuserAddress()
         const oldBal = await tokenMigration.oldSponBalance(walletAddress) / 10 ** 18
         const newBal = await tokenMigration.newSponBalance(walletAddress) / 10 ** 18
-        const commmitBalance = await tokenMigration.getUserCommittedBalance(walletAddress)/10**18
+        const commmitBalance = await tokenMigration.getUserCommittedBalance(walletAddress) / 10 ** 18
         dispatch({type: actionType.UPDATE_BALANCE, balance: oldBal, newBalance: newBal})
         dispatch({type: actionType.UPDATE_COMMIT_BALANCE, commitBalance: commmitBalance})
     }
 
-    function handleClear(){
+    function handleClear() {
         window.location.reload()
     }
 
     return (
-        <Box bg="gray.800" h="100vh" w="100%">
+        <Box bg="gray.800" minH="100vh" w="100%">
             <Dialog isOpen={isOpenDialog4} onClose={onCloseDialog4}
                     message={'Insufficient Remaining Balance'}/>
             <Dialog isOpen={isOpenDialog7} onClose={onCloseDialog7}
@@ -149,7 +161,7 @@ export default function Layout() {
             <Dialog isOpen={isOpenDialog5} onClose={onCloseDialog5}
                     message={'Please approve the swap, wait another 20 seconds and check your NSPON token at the button top right'}/>
             <Dialog isOpen={isOpenDialog} onClose={onCloseDialog}
-                    message={'You should check on "By checking this box, it means that you agree to commit SPON tokens to work for dataset generation of JURY protocol"'}/>
+                    message={'You should check on "By checking this box, you consent to committing SPON tokens for dataset generation of our JURY™ protocol."'}/>
             <Dialog isOpen={isOpenDialog2} onClose={onCloseDialog2}
                     message={<><span>You are not connecting to a Metamask account. To know how to do it, </span><a
                         target="_blank" rel="noopener noreferrer"
@@ -167,7 +179,7 @@ export default function Layout() {
             <Flex w="100%" justifyContent="center">
                 <Box>
                     <Heading color="gray.400" size="xl" margin="auto">
-                        Sponsee Migration Webpage
+                        Participate in JURY™
                     </Heading>
                 </Box>
             </Flex>
@@ -175,78 +187,150 @@ export default function Layout() {
             <Flex w="100%" justifyContent="center">
                 <Box>
                     <Checkbox onChange={handleCheck} color="gray.400" fontSize="60px">
-                        By checking this box, it means that you agree to commit SPON tokens to work for dataset generation of JURY protocol.
+                        By checking this box, you consent to committing SPON tokens for dataset generation of our JURY™ protocol.
                     </Checkbox>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Tooltip label="Hover me" placement="top-end">
-                <Flex color="gray.400" alignItems="center" w="50%">
-                    <Spacer/>
-                    Amount of tokens to commit
-                </Flex>
+                <Tooltip
+                    label="This is how many $SPON tokens you wish to commit to the JURY™ pool. These tokens will then be transferred to a separate wallet and locked up for a duration of 3 months. Your JURY™ rewards will be scaled off the number of $SPON committed. The more you commit, the more you get rewarded.For the purposes of this testnet trial, this would refer to how many OSPON tokens (the test token you received) you are committing. Please set this to 100% of your OSPON."
+                    placement="top-end">
+                    <Flex color="gray.400" alignItems="center" w="50%">
+                        <Spacer/>
+                        Amount of tokens to commit
+                    </Flex>
                 </Tooltip>
                 <Box w="50%">
                     <Input
                         onClick={handleClick}
                         onChange={handleInputAmount}
-                        placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
+                        placeholder={commitAmount.toString()} w="120px" ml="50px" color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Flex color="gray.400" alignItems="center" w="50%">
-                    <Spacer/>
-                    Old balance
-                </Flex>
+                <Tooltip
+                    label="This is how many $SPON tokens you have in your Metamask wallet. This is will be reflected automatically.For the purposes of this testnet trial, this would refer to how many OPSON tokens (the test token you received) you have in your wallet."
+                    placement="top-end">
+                    <Flex color="gray.400" alignItems="center" w="50%">
+                        <Spacer/>
+                        Old balance
+                    </Flex>
+                </Tooltip>
                 <Box w="50%">
-                    <Input onClick={handleClick} readOnly={true} placeholder={oldBalance.toString()} w="200px" ml="50px"
+                    <Input onClick={handleClick} readOnly={true} placeholder={oldBalance.toString()} w="120px" ml="50px"
                            color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Flex color="gray.400" alignItems="center" w="50%">
-                    <Spacer/>
-                    New balance
-                </Flex>
+                <Tooltip
+                    label="This is the remaining non-committed $SPON tokens that will be airdropped to your wallet. This is will be reflected automatically. For the purposes of this testnet trial, this would refer to how many NPSON tokens (the new test token you will receive by transferring over your OSPON) you will receive in your wallet."
+                    placement="top-end">
+                    <Flex color="gray.400" alignItems="center" w="50%">
+                        <Spacer/>
+                        New balance
+                    </Flex>
+                </Tooltip>
                 <Box w="50%">
-                    <Input onClick={handleClick} readOnly={true} placeholder={newBalance.toString()} w="200px" ml="50px"
+                    <Input onClick={handleClick} readOnly={true} placeholder={newBalance.toString()} w="120px" ml="50px"
                            color="gray.400"/>
                 </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Flex color="gray.400" alignItems="center" w="50%">
-                    <Spacer/>
-                    New commit balance
-                </Flex>
+                <Tooltip
+                    label="This is the final number of tokens you have committed to JURY™. This field will also be updated automatically according to the fields above."
+                    placement="top-end">
+                    <Flex color="gray.400" alignItems="center" w="50%">
+                        <Spacer/>
+                        New commit balance
+                    </Flex>
+                </Tooltip>
                 <Flex w="50%">
-                    <Input readOnly={true} placeholder={commitAmount.toString()} w="200px" ml="50px" color="gray.400"/>
+                    <Input readOnly={true} placeholder={commitAmount.toString()} w="120px" ml="50px" color="gray.400"/>
                     <Flex color="gray.400" alignItems="center" ml="20px">
                     </Flex>
                 </Flex>
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Button w="100px" isDisabled={isMigrateDisable} onClick={handleMigrate}>Migrate</Button>
+                <Button w="150px" isDisabled={isMigrateDisable} onClick={handleMigrate}>Join the JURY™</Button>
                 <Button w="100px" ml="15px" onClick={handleClear}>Clear</Button>
+            </Flex>
+            <Box h="50px" w="100%"></Box>
+            <Flex w="100%" justifyContent="center" alignItems="middle">
+                <Box color="gray.200" w="80%">
+                    <Text fontSize="lg" fontWeight="bold">**How to take part:</Text>
+                    <Box h="10px" w="100%"></Box>
+                    <Text fontSize="md">1) Connect your Metamask to BSC</Text>
+                    <Text fontSize="md">2) Tick the checkbox :</Text>
+                    <Text fontSize="md">By checking this box, you consent to committing SPON tokens for dataset
+                        generation of our JURY™ protocol.</Text>
+                    <Text fontSize="md">3) How many tokens would you like to add to JURY™ Pool? (Your JURY™ rewards will be scaled off the number of $SPON committed. The more you commit, the more you get rewarded) </Text>
+                    <Text fontSize="md">4) Click the “Join the JURY™” button. A Metamask Pop-up asking you to approve
+                        the transaction will appear. Please confirm that transaction.</Text>
+                    <Text fontSize="md">5) Close the pop-up message and wait for 20 seconds for the transaction to be
+                        completed.</Text>
+                    <Text fontSize="md">6) A “SWAP token” transaction request will pop-up on Metamask. Please confirm
+                        the transaction and wait for 20 seconds for it to be completed.</Text>
+                    <Text fontSize="md">7) Once the transaction is completed on Metamask, please check your New Token
+                        balance and Commit balance by clicking the button on the top right corner of the web-page. You
+                        can also see your new SPON token balance through Metamask.</Text>
+                </Box>
             </Flex>
             <Box h="20px" w="100%"></Box>
             <Flex w="100%" justifyContent="center" alignItems="middle">
-                <Box color="gray.200" w="50%">
-                    <Text fontSize="lg" fontWeight="bold">**Steps for migration process :</Text>
+                <Divider orientation="horizontal" w="900px"/>
+            </Flex>
+            <Box h="20px" w="100%"></Box>
+            <Flex w="100%" justifyContent="center" alignItems="middle">
+                <Box color="gray.200" w="80%">
+                    <Text fontSize="md" fontWeight="bold">Legend: </Text>
+                    <Box h="20px" w="100%"></Box>
+                    <Text fontSize="md">[ Fields you need to fill in ]</Text>
                     <Box h="10px" w="100%"></Box>
-                    <Text fontSize="md" >1. Connecting metamask to BSC :</Text>
-                    <Text fontSize="md">2. Check on the below checkbox:</Text>
-                    <Text fontSize="md">By checking this box, it means that you agree to commit SPON tokens to work for dataset generation of JURY protocol.</Text>
-                    <Text fontSize="md">3. Input the token amount to commit greater than 0.</Text>
-                    <Text fontSize="md">4. Check the values of old balance, new balance and new commit balance that will be updated after successful migration.</Text>
-                    <Text fontSize="md">5. Click the “migrate” button. This will pop-out an approve transaction (old SPON token balance) request in metamask. Please confirm that transaction.</Text>
-                    <Text fontSize="md">6. Close the pop-up message and  please wait for 20 seconds for the transaction to complete.</Text>
-                    <Text fontSize="md">7. There will occur a new “SWAP token” transaction request will pop-up on metamask. Please confirm the transaction and wait for 20 seconds for it to be completed.</Text>
-                    <Text fontSize="md">8. Once, transaction is completed in metamask, please check the updated New Token balance and commit balance by clicking on top right button of the web-page. Apparently, you can also check the new SPON token balance through metamask.</Text>
+                    <Text fontSize="md" float="left"><Text fontSize="md" fontWeight="bold" float="left">Amount of tokens
+                        to commit : </Text>This is how many $SPON tokens you wish to commit to the JURY™ pool. These
+                        tokens will then be transferred to a separate wallet and locked up for a duration of 3 months.
+                        Your JURY™ rewards will be scaled off the number of $SPON committed. The more you commit, the
+                        more you get rewarded.</Text>
+                    <div style={
+                        {clear:"both"}
+                    }></div>
+                    <Box h="20px" w="100%"></Box>
+                    <Text fontSize="md" fontStyle="italic">For the purposes of this testnet trial, this would refer to
+                        how many OSPON tokens (the test token you received) you are committing. Please set this to 100%
+                        of your OSPON.</Text>
+                </Box>
+            </Flex>
+            <Box h="20px" w="100%"></Box>
+            <Flex w="100%" justifyContent="center" alignItems="middle">
+                <Divider orientation="horizontal" w="900px"/>
+            </Flex>
+            <Box h="20px" w="100%"></Box>
+            <Flex w="100%" justifyContent="center" alignItems="middle">
+                <Box color="gray.200" w="80%">
+                    <Text fontSize="md">[ Fields that will be updated automatically once you fill in the above]</Text>
+                    <Box h="10px" w="100%"></Box>
+                    <Text fontSize="md" float="left"><Text fontSize="md" fontWeight="bold" float="left">Old Balance :</Text>This is how many $SPON tokens you have in your Metamask wallet. This is will be reflected automatically.</Text>
+                    <div style={
+                        {clear:"both"}
+                    }></div>
+                    <Text fontSize="md" fontStyle="italic">For the purposes of this testnet trial, this would refer to how many OPSON tokens (the test token you received) you have in your wallet.</Text>
+                    <Box h="20px" w="100%"></Box>
+                    <Text fontSize="md" float="left"><Text fontSize="md" fontWeight="bold" float="left">New Balance : </Text>This is the remaining non-committed $SPON tokens that will be airdropped to your wallet. This is will be reflected automatically.</Text>
+                    <div style={
+                        {clear:"both"}
+                    }></div>
+                    <Text fontSize="md" fontStyle="italic">For the purposes of this testnet trial, this would refer to how many NPSON tokens (the new test token you will receive by transferring over your OSPON) you will receive in your wallet.</Text>
+                    <Box h="10px" w="100%"></Box>
+                    <Text fontSize="md" float="left"><Text fontSize="md" fontWeight="bold" float="left">New commit balance : </Text>This is the final number of tokens you have committed to JURY™. This field will also be updated automatically according to the fields above.</Text>
+                    <div style={
+                        {clear:"both"}
+                    }></div>
+                    <Box h="40px" w="100%"></Box>
                 </Box>
             </Flex>
         </Box>
